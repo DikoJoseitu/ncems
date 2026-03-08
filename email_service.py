@@ -15,8 +15,6 @@ print('SENDER_PASSWORD:',SENDER_PASSWORD)
 # SMTP Configuration
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-SENDER_EMAIL = "espiritujoseph008@gmail.com"
-SENDER_PASSWORD = "oqan sgvo qwnn agfw"
 
 def send_application_confirmation_email(student_email, student_name, student_type, course_choices):
     """
