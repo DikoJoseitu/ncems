@@ -378,7 +378,8 @@ def admission_freshmen():
             `student_lastschool_attended`, `student_lastschool_type`, `student_lastschool_address`, `student_academic_strand`, 
             `student_course_choice1`, `student_course_choice2`, `student_course_choice3`, 
             `student_type`, 
-            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`
+            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`,
+            `student_examgrade`, `admission_rejection_reason`
         )
         VALUES (
             %s,
@@ -393,7 +394,8 @@ def admission_freshmen():
             %s, %s, %s, %s,
             %s, %s, %s,
             %s,
-            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending'
+            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending',
+            0, ''
         )
         """
         
@@ -568,7 +570,8 @@ def admission_transferee():
             `student_lastschool_attended`, `student_lastschool_type`, `student_lastschool_address`, `student_academic_strand`, 
             `student_course_choice1`, `student_course_choice2`, `student_course_choice3`, 
             `student_type`, 
-            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`
+            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`,
+            `student_examgrade`, `admission_rejection_reason`
         )
         VALUES (
             %s,
@@ -583,7 +586,8 @@ def admission_transferee():
             %s, %s, %s, %s,
             %s, %s, %s,
             %s,
-            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending'
+            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending',
+            0, ''
         )
         """
         
