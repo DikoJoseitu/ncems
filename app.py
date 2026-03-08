@@ -78,14 +78,14 @@ def login():
 
         # ── Check if email exists in STUDENTS ──────────────────────────────
         cursor.execute(
-            "SELECT STUDENT_EMAIL, STUDENT_STATUS, STUDENT_TYPE FROM STUDENTS WHERE STUDENT_EMAIL = %s",
+            "SELECT student_email, student_status, student_type FROM students WHERE student_email = %s",
             (email,)
         )
         student = cursor.fetchone()
 
         if student:
             # ── Fetch school status (enrollment) ───────────────────────────
-            cursor.execute("SELECT Enrollment, academic_year, semester FROM SCHOOL_STATUS ORDER BY id DESC LIMIT 1")
+            cursor.execute("SELECT Enrollment, academic_year, semester FROM school_status ORDER BY id DESC LIMIT 1")
             school_status = cursor.fetchone()
 
             if not school_status or school_status["Enrollment"] == 0:
@@ -94,13 +94,13 @@ def login():
                     "message": "Norzagaray College is not yet accepting enrollment as of the moment. Please wait for further announcements."
                 })
 
-            if student["STUDENT_TYPE"].upper() != "REGULAR":
+            if student["student_type"].upper() != "REGULAR":
                 return jsonify({
                     "type": "error",
                     "message": "Your account is not eligible for online enrollment. Please contact your college adviser for enrollment."
                 })
 
-            status = student["STUDENT_STATUS"].upper()
+            status = student["student_status"].upper()
             print(f"DEBUG: Student found with email {email}, status: {status}")
 
             if status == "ENROLLED":
@@ -146,7 +146,7 @@ def login():
 
         else:
             # ── Email not in STUDENTS — check ADMISSIONS ────────────────────
-            cursor.execute("SELECT STUDENT_EMAIL FROM ADMISSIONS WHERE STUDENT_EMAIL = %s", (email,))
+            cursor.execute("SELECT student_email FROM admissions WHERE student_email = %s", (email,))
             admission = cursor.fetchone()
 
             if admission:
@@ -156,7 +156,7 @@ def login():
                 })
 
             # Check if admissions are open
-            cursor.execute("SELECT Admission FROM SCHOOL_STATUS ORDER BY id DESC LIMIT 1")
+            cursor.execute("SELECT Admission FROM school_status ORDER BY id DESC LIMIT 1")
             school_status = cursor.fetchone()
 
             if not school_status or school_status["Admission"] == 0:
