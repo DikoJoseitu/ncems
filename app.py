@@ -1,17 +1,32 @@
 from flask import Flask, request, jsonify, render_template
 import mysql.connector
-from datetime import date
+from datetime import date, datetime
 from email_service import send_application_confirmation_email
 from PIL import Image
 import io
 import os
+
+def parse_birthdate(raw):
+    """Convert any birthdate string to YYYY-MM-DD for MySQL.
+    Handles: 'March 23, 2000', '2000-03-23', '03/23/2000', '23/03/2000'
+    Returns None if empty or unparseable.
+    """
+    if not raw or not raw.strip():
+        return None
+    raw = raw.strip()
+    for fmt in ('%B %d, %Y', '%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%m-%d-%Y'):
+        try:
+            return datetime.strptime(raw, fmt).strftime('%Y-%m-%d')
+        except ValueError:
+            continue
+    return None
 
 def get_db_connection():
     conn = mysql.connector.connect(
         host=os.environ.get("DB_HOST"),
         user=os.environ.get("DB_USER"),
         password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME", "NCEMS"),
+        database=os.environ.get("DB_NAME", "ncems"),
         port=int(os.environ.get("DB_PORT", 3306))
     )
     return conn
@@ -207,7 +222,7 @@ def admission_freshmen():
         suffix = request.form.get("suffix")
         civil_status = request.form.get("civil_status")
         gender = request.form.get("gender")
-        birthdate = request.form.get("birthdate", "")
+        birthdate = parse_birthdate(request.form.get("birthdate", ""))
         age = request.form.get("age")
         nationality = request.form.get("nationality")
         religion = request.form.get("religion")
@@ -391,7 +406,7 @@ def admission_transferee():
         suffix = request.form.get("suffix")
         civil_status = request.form.get("civil_status")
         gender = request.form.get("gender")
-        birthdate = request.form.get("birthdate", "")
+        birthdate = parse_birthdate(request.form.get("birthdate", ""))
         age = request.form.get("age")
         nationality = request.form.get("nationality")
         religion = request.form.get("religion")
