@@ -25,34 +25,40 @@ def generate_admission_number(cursor):
     """Generate next admission number in format YYYYS####
     e.g. 202510001 = year 2025, semester 1, sequence 0001
     Matches the format used by the admin panel."""
-    today = datetime.now()
-    year = today.year
+    year = datetime.now().year
 
-    # Get semester from school_status
+    # Get semester from school_status (try both cases)
+    sem = "1"
     try:
         cursor.execute("SELECT semester FROM school_status ORDER BY id DESC LIMIT 1")
         row = cursor.fetchone()
-        sem_raw = str(row["semester"] if row else "1").strip().upper()
-        sem = "2" if sem_raw.startswith("2") or "SECOND" in sem_raw else "1"
+        if row:
+            val = row["semester"] if isinstance(row, dict) else row[0]
+            sem_raw = str(val).strip().upper()
+            sem = "2" if sem_raw.startswith("2") or "SECOND" in sem_raw else "1"
     except Exception:
         sem = "1"
 
     prefix = f"{year}{sem}"
 
     # Find the highest existing sequence for this year+sem prefix
-    cursor.execute(
-        "SELECT student_admission_number FROM admissions WHERE student_admission_number LIKE %s",
-        (f"{prefix}%",)
-    )
-    existing = [r[0] for r in cursor.fetchall()]
-    max_seq = 0
-    for num in existing:
-        try:
-            seq = int(str(num)[len(prefix):])
-            if seq > max_seq:
-                max_seq = seq
-        except (ValueError, IndexError):
-            pass
+    try:
+        cursor.execute(
+            "SELECT student_admission_number FROM admissions WHERE student_admission_number LIKE %s",
+            (f"{prefix}%",)
+        )
+        rows = cursor.fetchall()
+        max_seq = 0
+        for row in rows:
+            val = row["student_admission_number"] if isinstance(row, dict) else row[0]
+            try:
+                seq = int(str(val)[len(prefix):])
+                if seq > max_seq:
+                    max_seq = seq
+            except (ValueError, IndexError):
+                pass
+    except Exception:
+        max_seq = 0
 
     return f"{prefix}{(max_seq + 1):04d}"
 
@@ -77,6 +83,12 @@ def get_db_connectionforlocation():
     )
 app = Flask(__name__)
 app_secret_key = "your_secret_key_here"
+
+@app.errorhandler(500)
+def internal_error(e):
+    import traceback
+    traceback.print_exc()
+    return jsonify({"success": False, "message": f"Server error: {str(e)}"}), 500
 
 
 @app.route('/api/provinces')
