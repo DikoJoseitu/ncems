@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Norzagaray College Online Enrollment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    .carousel-inner {
+      transition: transform 0.5s ease-in-out;
+      display: flex;
+    }
+    .carousel-slide {
+      width: 100%;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[url('/static/NCBG.jpg')] bg-cover bg-center bg-no-repeat text-white overflow-y-auto">
+  <!-- Blur overlay -->
+  <div class="fixed inset-0 backdrop-blur-sm bg-black/30 -z-0"></div>
+
+  <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 py-3">
+
+    <!-- Logo -->
+    <img src="/static/NCLOGO.png" alt="Norzagaray College Logo"
+      class="w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 mb-2 md:mb-4">
+
+    <!-- Title -->
+    <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight">NORZAGARAY COLLEGE</h1>
+    <p class="text-base sm:text-lg md:text-xl mt-1 mb-2 md:mb-4 opacity-90">Online Enrollment System</p>
+
+    <!-- Card -->
+    <div class="relative bg-white bg-opacity-20 backdrop-blur-sm border border-white border-opacity-30 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden pb-10 mt-2 sm:mt-4">
+
+      <div id="carouselInner" class="carousel-inner">
+
+        <!-- Slide 1: Irregular Student -->
+        <div class="carousel-slide px-4 py-3">
+          <h2 class="text-lg sm:text-xl font-bold mb-2 drop-shadow-lg">IRREGULAR STUDENT</h2>
+          <div class="w-full bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl shadow-lg p-3 sm:p-5 text-left space-y-2">
+            <div class="flex items-start gap-3 bg-white/20 rounded-xl p-3">
+              <span class="text-2xl">&#9888;&#65039;</span>
+              <p class="text-sm sm:text-base leading-relaxed">
+                <strong>Irregular students</strong> are <strong>not eligible</strong> to use this Online Enrollment System.
+              </p>
+            </div>
+            <p class="text-xs sm:text-sm leading-relaxed text-white/90">
+              Please proceed to your <strong>College Adviser</strong> for manual enrollment assistance and subject validation.
+            </p>
+            <p class="text-xs text-white/70 border-t border-white/30 pt-2">
+              If you believe this is an error, contact the Registrar's Office for clarification.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 2: Regular Student -->
+        <div class="carousel-slide px-4 py-3">
+          <h2 class="text-lg sm:text-xl font-bold mb-2 drop-shadow-lg">REGULAR STUDENT</h2>
+          <div class="w-full bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl shadow-lg p-3 sm:p-5 text-left space-y-2">
+            <p class="text-xs sm:text-sm text-white/90 mb-1">Follow these steps to enroll online:</p>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">1</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Input Email</p>
+                <p class="text-xs text-white/80">Enter your registered school email address.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">2</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Confirm Enrollment</p>
+                <p class="text-xs text-white/80">Review your details and confirm your enrollment for the current semester.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">3</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Wait for COR</p>
+                <p class="text-xs text-white/80">Your Certificate of Registration will be sent to your email once verified.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Enrollment Form -->
+        <div class="carousel-slide px-6 py-4 pt-16">
+          <p class="text-xs sm:text-sm font-semibold mb-2 opacity-90">Enter your email to get started</p>
+          <form action="/login" method="POST" class="flex flex-col items-center w-full">
+            <input id="email" name="email" type="email" placeholder="Enter your email"
+              class="px-4 py-3 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 w-full max-w-xs mb-3" required>
+            <button type="submit"
+              class="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 shadow-md hover:shadow-xl w-36">
+              Enroll
+            </button>
+          </form>
+        </div>
+
+        <!-- Slide 4: FRESHMEN -->
+        <div class="carousel-slide px-4 py-3">
+          <h2 class="text-lg sm:text-xl font-bold mb-2 drop-shadow-lg">FRESHMEN</h2>
+          <div class="w-full bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl shadow-lg p-3 sm:p-5 text-left space-y-2">
+            <p class="text-xs sm:text-sm text-white/90 mb-1">Requirements for admission:</p>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">1</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Certificate of Enrollment</p>
+                <p class="text-xs text-white/80">Grade 12 Certificate of Enrollment.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">2</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Grade 11 &amp; 12 Card</p>
+                <p class="text-xs text-white/80">Report card for both Grade 11 and Grade 12.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">3</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Good Moral Certificate</p>
+                <p class="text-xs text-white/80">Issued by your school principal or guidance counselor.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">4</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">PSA Birth Certificate</p>
+                <p class="text-xs text-white/80">Original or certified true copy from PSA.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">5</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">2x2 Picture</p>
+                <p class="text-xs text-white/80">White background, recent photo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 5: TRANSFEREE -->
+        <div class="carousel-slide px-4 py-3">
+          <h2 class="text-lg sm:text-xl font-bold mb-2 drop-shadow-lg">TRANSFEREE</h2>
+          <div class="w-full bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl shadow-lg p-3 sm:p-5 text-left space-y-2">
+            <p class="text-xs sm:text-sm text-white/90 mb-1">Requirements for admission:</p>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">1</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Honorable Dismissal</p>
+                <p class="text-xs text-white/80">Issued by your previous school.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">2</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Certified True Copy of Grades</p>
+                <p class="text-xs text-white/80">Official transcript from your previous institution.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">3</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">Good Moral Certificate</p>
+                <p class="text-xs text-white/80">Issued by your previous school's registrar.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">4</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">PSA Birth Certificate</p>
+                <p class="text-xs text-white/80">Original or certified true copy from PSA.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="flex-shrink-0 w-5 h-5 bg-white text-blue-700 font-bold rounded-full flex items-center justify-center text-xs">5</span>
+              <div>
+                <p class="font-semibold text-xs sm:text-sm">2x2 Picture</p>
+                <p class="text-xs text-white/80">White background, recent photo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 6: RETURNEE -->
+        <div class="carousel-slide px-4 py-3">
+          <h2 class="text-lg sm:text-xl font-bold mb-2 drop-shadow-lg">RETURNEE</h2>
+          <div class="w-full bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl shadow-lg p-3 sm:p-5 text-left space-y-2">
+            <div class="flex items-start gap-3 bg-white/20 rounded-xl p-3">
+              <span class="text-2xl">&#128203;</span>
+              <p class="text-sm sm:text-base leading-relaxed">
+                <strong>Returning students</strong> cannot enroll through this system.
+              </p>
+            </div>
+            <p class="text-xs sm:text-sm leading-relaxed text-white/90">
+              Please proceed to the <strong>Registrar's Office</strong> for enrollment and bring the following:
+            </p>
+            <ul class="list-disc list-inside text-sm sm:text-base space-y-1 pl-1">
+              <li>Letter of Intent <span class="text-white/70 text-xs">(signed by College Dean)</span></li>
+              <li>Copy of Grades</li>
+              <li>2x2 Picture <span class="text-white/70 text-xs">(white background)</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom-left: Prev icon button -->
+      <div class="absolute bottom-3 left-4 group">
+        <button id="prevButton" onclick="prevSlide()"
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-900/80 hover:bg-blue-700 text-white transition duration-200 shadow">
+          &#8592;
+        </button>
+        <span class="absolute bottom-10 left-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          Previous
+        </span>
+      </div>
+
+      <!-- Bottom-right: Next icon button -->
+      <div class="absolute bottom-3 right-4 group">
+        <button id="navButton" onclick="nextSlide()"
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-900/80 hover:bg-blue-700 text-white transition duration-200 shadow">
+          &#8594;
+        </button>
+        <span id="navTooltip" class="absolute bottom-10 right-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          View Requirements
+        </span>
+      </div>
+
+      <!-- Dots indicator -->
+      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        <span class="dot w-2.5 h-2.5 rounded-full bg-blue-900 cursor-pointer" onclick="goToSlide(0)"></span>
+        <span class="dot w-2.5 h-2.5 rounded-full bg-gray-400 cursor-pointer" onclick="goToSlide(1)"></span>
+        <span class="dot w-2.5 h-2.5 rounded-full bg-gray-400 cursor-pointer" onclick="goToSlide(2)"></span>
+        <span class="dot w-2.5 h-2.5 rounded-full bg-gray-400 cursor-pointer" onclick="goToSlide(3)"></span>
+        <span class="dot w-2.5 h-2.5 rounded-full bg-gray-400 cursor-pointer" onclick="goToSlide(4)"></span>
+        <span class="dot w-2.5 h-2.5 rounded-full bg-gray-400 cursor-pointer" onclick="goToSlide(5)"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 2;
+    const totalSlides = 6;
+    function updateDots() {
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((dot, index) => {
+        dot.classList.remove('bg-blue-900');
+        dot.classList.add('bg-gray-400');
+        if (index === currentSlide) {
+          dot.classList.remove('bg-gray-400');
+          dot.classList.add('bg-blue-900');
+        }
+      });
+    }
+    function prevSlide() {
+      const carouselInner = document.getElementById('carouselInner');
+      const navTooltip    = document.getElementById('navTooltip');
+      const prevButton    = document.getElementById('prevButton');
+      if (currentSlide > 0) {
+        currentSlide--;
+        carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
+        updateDots();
+        prevButton.style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+        const labels = ['Regular Student Info','Proceed to Enrollment','View Requirements',"View Transferee's Requirements","View Returnee's Requirements",'Back to Start'];
+        if (navTooltip) navTooltip.textContent = labels[currentSlide];
+      }
+    }
+    function nextSlide() {
+      const carouselInner = document.getElementById('carouselInner');
+      const navButton = document.getElementById('navButton');
+      currentSlide = (currentSlide + 1) % totalSlides;
+      carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
+      const labels = ['Regular Student Info','Proceed to Enrollment','View Requirements',"View Transferee's Requirements","View Returnee's Requirements",'Back to Start'];
+      const navTooltip = document.getElementById('navTooltip');
+      if (navTooltip) navTooltip.textContent = labels[currentSlide];
+      document.getElementById('prevButton').style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+      updateDots();
+    }
+    function goToSlide(slideIndex) {
+      const carouselInner = document.getElementById('carouselInner');
+      const navButton = document.getElementById('navButton');
+      currentSlide = slideIndex;
+      carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
+      const labels = ['Regular Student Info','Proceed to Enrollment','View Requirements',"View Transferee's Requirements","View Returnee's Requirements",'Back to Start'];
+      const navTooltip = document.getElementById('navTooltip');
+      if (navTooltip) navTooltip.textContent = labels[currentSlide];
+      document.getElementById('prevButton').style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+      updateDots();
+    }
+    // Initialize to slide 3 (index 2)
+    updateDots();
+    document.getElementById('carouselInner').style.transform = `translateX(-200%)`;
+    document.getElementById('navTooltip').textContent = 'View Requirements';
+    document.getElementById('prevButton').style.visibility = 'visible';
+
+    // ── Enrollment form handler ──────────────────────────────────────────
+    const enrollmentForm = document.querySelector("form");
+    if (enrollmentForm) {
+      enrollmentForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const emailInput = document.getElementById("email");
+        const formData   = new FormData(this);
+        const email      = emailInput ? emailInput.value.trim() : "";
+
+        const response = await fetch("/login", { method: "POST", body: formData });
+        const result   = await response.json();
+
+        if (result.type === "question") {
+          Swal.fire({
+            title: result.message,
+            showDenyButton: true,
+            confirmButtonText: result.options[0],
+            denyButtonText:    result.options[1]
+          }).then((choice) => {
+            if (choice.isConfirmed) {
+              window.location.href = "/freshmen.html?email=" + encodeURIComponent(email);
+            } else if (choice.isDenied) {
+              window.location.href = "/transferee.html?email=" + encodeURIComponent(email);
+            }
+          });
+
+        } else if (result.type === "enroll_confirm") {
+          let semLabel = result.semester || "N/A";
+          if (semLabel ==='1'){
+            semLabel = '1st'
+          } else {
+            semLabel = '2nd'
+          }
+          const ayLabel  = result.academic_year || "N/A";
+          Swal.fire({
+            title: '<span style="color:#1d4ed8;font-size:1.1rem;font-weight:700;">📋 Confirm Enrollment</span>',
+            html: `
+              <div style="text-align:left;font-size:0.9rem;line-height:1.8;">
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-bottom:12px;">
+                  <p style="margin:0 0 4px 0;color:#6b7280;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Student</p>
+                  <p style="margin:0;font-weight:700;font-size:1rem;color:#111827;">${result.student_name}</p>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                  <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">
+                    <p style="margin:0 0 2px 0;color:#6b7280;font-size:0.72rem;font-weight:600;text-transform:uppercase;">Student No.</p>
+                    <p style="margin:0;font-weight:700;color:#1f2937;font-family:monospace;">${result.student_number}</p>
+                  </div>
+                  <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">
+                    <p style="margin:0 0 2px 0;color:#6b7280;font-size:0.72rem;font-weight:600;text-transform:uppercase;">Section</p>
+                    <p style="margin:0;font-weight:700;color:#1f2937;">${result.section || 'N/A'}</p>
+                  </div>
+                  <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">
+                    <p style="margin:0 0 2px 0;color:#6b7280;font-size:0.72rem;font-weight:600;text-transform:uppercase;">Course</p>
+                    <p style="margin:0;font-weight:700;color:#1f2937;">${result.course}</p>
+                  </div>
+                  <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;">
+                    <p style="margin:0 0 2px 0;color:#6b7280;font-size:0.72rem;font-weight:600;text-transform:uppercase;">Year Level</p>
+                    <p style="margin:0;font-weight:700;color:#1f2937;">${result.year_level}</p>
+                  </div>
+                </div>
+                <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;text-align:center;">
+                  <p style="margin:0 0 2px 0;color:#92400e;font-size:0.75rem;font-weight:600;text-transform:uppercase;">Enrolling For</p>
+                  <p style="margin:0;font-weight:700;font-size:1rem;color:#78350f;">A.Y. ${ayLabel} &nbsp;·&nbsp; ${semLabel} Semester</p>
+                </div>
+              </div>
+            `,
+            icon: 'question',
+            showCancelButton:   true,
+            confirmButtonText:  '✅ Yes, Enroll Me',
+            cancelButtonText:   'Cancel',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor:  '#6b7280',
+            reverseButtons:     true,
+            width:              480,
+          }).then(async (choice) => {
+            if (!choice.isConfirmed) return;
+            Swal.fire({ title: 'Submitting enrollment…', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            try {
+              const res  = await fetch("/enroll-student", {
+                method:  "POST",
+                headers: { "Content-Type": "application/json" },
+                body:    JSON.stringify({ email: result.email })
+              });
+              const data = await res.json();
+              if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Enrollment Submitted!', text: data.message, confirmButtonColor: '#2563eb', confirmButtonText: 'Done' });
+              } else {
+                Swal.fire({ icon: 'error', title: 'Enrollment Failed', text: data.message, confirmButtonColor: '#2563eb' });
+              }
+            } catch (err) {
+              Swal.fire({ icon: 'error', title: 'Error', text: 'Could not reach the server.' });
+            }
+          });
+
+        } else {
+          Swal.fire({ icon: result.type, text: result.message });
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Norzagaray College Admission Test Online Application Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card {
+        @apply bg-white/90 backdrop-blur-md rounded-xl shadow-lg p-6 space-y-4;
+        }
+        .input {
+        @apply w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none;
+        }
+        .file-input {
+        @apply block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500;
+        }
+        
+        /* Loading spinner animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .loading-status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+    
+    /* ── Custom Blue Calendar Popup ── */
+    .cal-wrapper { position: relative; }
+    .cal-popup {
+        display: none;
+        position: absolute;
+        z-index: 9999;
+        top: calc(100% + 6px);
+        left: 0;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.18);
+        border: 1px solid #bfdbfe;
+        padding: 16px;
+        width: 300px;
+    }
+    .cal-popup.open { display: block; }
+    .cal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #1d4ed8;
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin-bottom: 10px;
+    }
+    .cal-header h2 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    .cal-header button {
+        background: rgba(255,255,255,0.2);
+        color: #fff;
+        border: none;
+        padding: 4px 9px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        line-height: 1;
+        transition: background 0.2s;
+    }
+    .cal-header button:hover { background: rgba(255,255,255,0.35); }
+    .cal-day-names {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        margin-bottom: 4px;
+    }
+    .cal-day-names div {
+        font-weight: 700;
+        font-size: 0.7rem;
+        color: #1d4ed8;
+        padding: 4px 0;
+    }
+    .cal-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+    }
+    .cal-days div {
+        padding: 7px 0;
+        margin: 1px;
+        border-radius: 7px;
+        font-size: 0.82rem;
+        color: #1e293b;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+    .cal-days div:hover { background: #dbeafe; color: #1d4ed8; }
+    .cal-days div.cal-empty { cursor: default; }
+    .cal-days div.cal-empty:hover { background: none; }
+    .cal-days div.cal-today {
+        border: 2px solid #2563eb;
+        color: #2563eb;
+        font-weight: 700;
+    }
+    .cal-days div.cal-selected {
+        background: #2563eb;
+        color: #fff;
+        font-weight: 700;
+    }
+    .cal-days div.cal-disabled {
+        color: #cbd5e1;
+        cursor: default;
+        pointer-events: none;
+    }
+    .cal-year-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .cal-year-row button {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        border-radius: 5px;
+        padding: 2px 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    .cal-year-row button:hover { background: #dbeafe; }
+    .cal-year-row span {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #1e293b;
+        min-width: 40px;
+        text-align: center;
+    }
+    </style>
+</head>
+<body class="min-h-screen bg-blue-900 bg-[url('/static/NCBG.jpg')] bg-cover bg-center bg-no-repeat bg-fixed flex items-center justify-center backdrop-blur-sm px-4 sm:px-6">
+    
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-container">
+            <div class="spinner" style="margin: 0 auto;"></div>
+            <div class="loading-text">Processing Your Application</div>
+            <div class="loading-status">Sending confirmation email...</div>
+        </div>
+    </div>
+    
+    <div class="overlay w-full max-w-5xl mx-auto mt-4 sm:mt-10 mb-4 sm:mb-10 shadow-2xl rounded-xl overflow-hidden bg-white/50 pt-10">
+<!-- Upmost Header -->  
+    <div class="bg-blue-700 rounded-t -m-10 mb-6 p-6 text-center text-white shadow-md">
+  <div class="flex items-center justify-center gap-4">
+    <img src="/static/NCLOGO.png" alt="Norzagaray College Logo" class="w-20 h-20">
+    <div>
+      <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold">
+        Norzagaray College Online Admission Form
+      </h1>
+      <p class="text-lg opacity-90 font-sans">
+        Please fill out all required fields <span class="text-red-300">*</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Form Container -->
+    <form id="admissionForm" method="POST" enctype="multipart/form-data" action="/admissiontransferee" class="overflow-y-auto p-3 sm:p-6 space-y-6 sm:space-y-10 w-full">
+      <!-- Hidden field for student type -->
+      <input type="hidden" name="student_type" value="Transferee">
+      <div id="formCarousel" class="w-full">
+
+<!-- Page 1 -->
+        <div class="form-page" data-page="1">
+
+<!-- Personal Information Section -->
+    <section class="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 fade-up" style="animation-delay:0.1s">
+        <h2 class="flex items-center gap-2 text-lg sm:text-2xl font-bold text-blue-700 border-b pb-3 mb-4 sm:mb-6"><i class="fa-solid fa-user"></i>Personal Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+
+        <!-- Last Name -->
+            <div>
+            <input type="text" name="last_name" id="last_name" 
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" 
+                required placeholder="ex. Dela Cruz"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="last_name" class="block mt-1 text-sm font-medium text-gray-700">Last Name <span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- First Name -->
+            <div>
+            <input type="text" name="first_name" id="first_name"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" 
+                required placeholder="ex. Juan"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="first_name" class="block mt-1 text-sm font-medium text-gray-700">First Name <span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Middle Name -->
+            <div>
+            <input type="text" name="middle_name" id="middle_name"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                placeholder="ex. Santos"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="middle_name" class="block mt-1 text-sm font-medium text-gray-700">Middle Name</label>
+            </div>
+
+        <!-- Suffix -->
+            <div>
+            <input type="text" name="suffix" id="suffix"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                placeholder="jr, IV"
+                oninput="this.value = this.value.toLowerCase()">
+            <label for="suffix" class="block mt-1 text-sm font-medium text-gray-700">Suffix</label>
+            </div>
+
+        <!-- Civil Status -->
+            <div>
+            <select name="civil_status" id="civil_status"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" required> 
+                <option disabled selected>Select Civil Status</option>
+                <option>SINGLE</option>
+                <option>MARRIED</option>
+                <option>WIDOWED</option>
+                <option>SEPARATED</option>
+            </select>
+            <label for="civil_status" class="block mt-1 text-sm font-medium text-gray-700">Civil Status<span class="text-red-500">*</span></label>
+        </div>
+
+        <!-- Gender -->
+            <div>
+            <select name="gender" id="gender"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" required>
+                <option disabled selected>Select Gender</option>
+                <option>MALE</option>
+                <option>FEMALE</option>
+            </select>
+            <label for="gender" class="block mt-1 text-sm font-medium text-gray-700">Gender<span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Birthdate -->
+            <div>
+            <input type="text" id="birthdate" autocomplete="off"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" placeholder="Select birthdate">
+            <input type="hidden" name="birthdate" id="birthdate_raw" required>
+            <label for="birthdate" class="block mt-1 text-sm font-medium text-gray-700">Birthdate<span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Age -->
+            <div>
+            <input type="number" name="age" id="age" readonly
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+            <label for="age" class="block mt-1 text-sm font-medium text-gray-700">Age</label>
+            </div>
+
+        <!-- nationality -->
+            <div>
+            <input type="text" name="nationality" id="nationality"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                value="FILIPINO"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="nationality" class="block mt-1 text-sm font-medium text-gray-700">Nationality<span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Religion -->
+            <div>
+            <input type="text" name="religion" id="religion"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                placeholder="ex. Christian"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="religion" class="block mt-1 text-sm font-medium text-gray-700">Religion</label>
+            </div>
+
+        <!-- Disability -->
+            <div class="col-span-1 sm:col-span-2">
+            <input type="text" name="disability" id="disability"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                placeholder="ex. Deaf, Intellectual Disability"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="disability" class="block mt-1 text-sm font-medium text-gray-700">Physical Disability</label>
+            </div>
+
+        </div>
+    </section>
+
+<!-- Contact and Address Section -->
+    <section class="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 fade-up mt-6 sm:mt-10" style="animation-delay:0.1s">
+        <h2 class="flex items-center gap-2 text-lg sm:text-2xl font-bold text-blue-700 border-b pb-3 mb-4 sm:mb-6"><i class="fa-solid fa-address-book"></i>Contact and Address</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <!-- Email -->
+            <div class="col-span-1 sm:col-span-2">
+            <input type="email" name="email" id="email" value="{{ email }}"
+                class=" w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" readonly>
+            <label for="email" class="block mt-1 text-sm font-medium text-gray-700">Email</label>
+            </div>
+
+        <!-- Contact Number -->
+            <div class="col-span-1 sm:col-span-2">
+            <input type="tel" name="contact_number" id="contact_number" value="09"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" 
+                required
+                pattern="^09\d{9}$"
+                maxlength="11"
+                placeholder="09XXXXXXXXX"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
+                        if (!this.value.startsWith('09')) this.value = '09' + this.value.substring(2);">
+            <label for="contact_number" class="block mt-1 text-sm font-medium text-gray-700">Contact Number <span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Country -->
+            <div>
+            <input type="text" name="country" id="country" value="PHILIPPINES"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                required placeholder="ex. Philippines"
+                oninput="this.value = this.value.toUpperCase()" readonly>
+            <label for="country" class="block mt-1 text-sm font-medium text-gray-700">Country<span class="text-red-500">*</span></label>
+            </div>
+        <!-- Province -->
+            <div>
+            <select name="province" id="province" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+            <option value="">---Select Province---</option>
+            </select>
+            <label for="province" class="block mt-1 text-sm font-medium text-gray-700">Province<span class="text-red-500">*</span></label>
+            </div>
+            
+        <!-- Municipality/City -->
+            <div>
+            <select name="municipality" id="municipality"class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"><option value="">---Select Municipality---</option></select>
+            <label for="municipality" class="block mt-1 text-sm font-medium text-gray-700">Municipality<span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Barangay -->
+            <div>
+            <select name="barangay" id="barangay"class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"><option value="">---Select Barangay---</option></select>
+            <label for="barangay" class="block mt-1 text-sm font-medium text-gray-700">Barangay<span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- Street/Village -->
+        <div>
+        <input type="text" name="streetorvillage" id="streetorvillage"
+            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+            placeholder="ex. Main St | Garden Village"
+            oninput="this.value = this.value.toUpperCase()">
+        <label for="streetorvillage" class="block mt-1 text-sm font-medium text-gray-700">Street / Village</label>
+        </div>
+
+        <!-- House Number -->
+            <div>
+            <input type="text" name="house_number" id="house_number"
+                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                required placeholder="ex. #123 | Blk1Lot1 | Apt2B"
+                oninput="this.value = this.value.toUpperCase()">
+            <label for="house_number" class="block mt-1 text-sm font-medium text-gray-700">House Number <span class="text-red-500">*</span></label>
+            </div>
+
+        <!-- ZipCode -->
+        <div>
+        <input type="number" name="zipcode" id="zipcode"
+            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+            placeholder="ex. 3022">
+        <label for="zipcode" class="block mt-1 text-sm font-medium text-gray-700">Zip Code</label>
+        </div>
+
+        </div>
+    </section>
+
+        </div>
+
+<!-- Page 2 -->
+        <div class="form-page" data-page="2" style="display:none;">
+            <section class="bg-white p-4 sm:p-6 rounded-lg shadow-md border border-gray-200 fade-up" style="animation-delay:0.1s">
+  <h2 class="flex items-center gap-2 text-lg sm:text-2xl font-bold text-blue-700 border-b pb-3 mb-4 sm:mb-6">
+    <i class="fa-solid fa-users"></i>Parents Information</h2>
+
+  <!-- Father -->
+  <div class="mb-8">
+    <h3 class="font-semibold text-gray-700 mb-4">Father's Information</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div>
+        <input type="text" name="father_lastname" id="father_lastname"
+            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"
+                    oninput="this.value = this.value.toUpperCase()" required>
+        <label for="father_lastname" class="block mt-1 text-sm font-medium text-gray-700">Last Name<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="text" name="father_firstname" id="father_firstname"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()" required>
+        <label for="father_firstname" class="block mt-1 text-sm font-medium text-gray-700">First Name<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="text" name="father_middlename" id="father_middlename"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()">
+        <label for="father_middlename" class="block mt-1 text-sm font-medium text-gray-700">Middle Name</label>
+      </div>
+      <div>
+        <input type="number" name="father_age" id="father_age"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" required>
+        <label for="father_age" class="block mt-1 text-sm font-medium text-gray-700">Age<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="email" name="father_email" id="father_email"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" placeholder="example@gmail.com"oninput="this.value = this.value.toUpperCase()">
+        <label for="father_email" class="block mt-1 text-sm font-medium text-gray-700">Email</label>
+      </div>
+      <div>
+        <input type="text" name="father_contact_number" id="father_contact_number" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" placeholder="09XXXXXXXXX"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
+                 if (!this.value.startsWith('09')) this.value = '09' + this.value.substring(2);">
+        <label for="father_contact_number" class="block mt-1 text-sm font-medium text-gray-700">Contact Number<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="text" name="father_occupation" id="father_occupation" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()">
+        <label for="father_occupation" class="block mt-1 text-sm font-medium text-gray-700">Occupation<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <select type="text" name="father_education" id="father_education"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+        <option>UNDER GRADUATE</option>
+        <option>HIGH SCHOOL GRADUATE</option>
+        <option>ASSOCIATE DEGREE</option>
+        <option>BACHELOR'S DEGREE</option>
+        <option>MASTER'S DEGREE</option>
+        <option>DOCTORAL DEGREE</option>
+      </select>         
+        <label for="father_education" class="block mt-1 text-sm font-medium text-gray-700">Educational Attainment<span class="text-red-500">*</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mother -->
+  <div class="mt-8">
+    <h3 class="font-semibold text-gray-700 mb-4">Mother's Information</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div>
+        <input type="text" name="mother_lastname" id="mother_lastname" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()">
+        <label for="mother_lastname" class="block mt-1 text-sm font-medium text-gray-700">Last Name<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="text" name="mother_firstname" id="mother_firstname" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()">
+        <label for="mother_firstname" class="block mt-1 text-sm font-medium text-gray-700">First Name<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="text" name="mother_middlename" id="mother_middlename"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()">
+        <label for="mother_middlename" class="block mt-1 text-sm font-medium text-gray-700">Middle Name</label>
+      </div>
+      <div>
+        <input type="number" name="mother_age" id="mother_age" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+        <label for="mother_age" class="block mt-1 text-sm font-medium text-gray-700">Age<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="email" name="mother_email" id="mother_email"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()"placeholder="example@gmail.com">
+        <label for="mother_email" class="block mt-1 text-sm font-medium text-gray-700">Email</label>
+      </div>
+      <div>
+        <input type="text" name="mother_contact_number" id="mother_contact_number" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"placeholder="09XXXXXXXXX" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
+                 if (!this.value.startsWith('09')) this.value = '09' + this.value.substring(2);">
+        <label for="mother_contact_number" class="block mt-1 text-sm font-medium text-gray-700">Contact Number<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <input type="text" name="mother_occupation" id="mother_occupation" required
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition"oninput="this.value = this.value.toUpperCase()">
+        <label for="mother_occupation" class="block mt-1 text-sm font-medium text-gray-700">Occupation<span class="text-red-500">*</span></label>
+      </div>
+      <div>
+        <select type="text" name="mother_education" id="mother_education"
+          class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+        <option>UNDER GRADUATE</option>
+        <option>HIGH SCHOOL GRADUATE</option>
+        <option>ASSOCIATE DEGREE</option>
+        <option>BACHELOR'S DEGREE</option>
+        <option>MASTER'S DEGREE</option>
+        <option>DOCTORAL DEGREE</option>
+      </select>
+                 <label for="mother_education" class="block mt-1 text-sm font-medium text-gray-700">Educational Attainment<span class="text-red-500">*</span></label>
+      </div>
+    </div>
+  </div>
+</section>
+        </div>
+
+<!-- Page 3-->
+        <div class="form-page" data-page="3" style="display:none;">
+            <!-- Educational Background Section -->
+            <section class="p-4 sm:p-8 bg-white/95 border border-blue-100 rounded-xl shadow-lg">
+  <h2 class="flex items-center gap-2 text-lg sm:text-2xl font-bold text-blue-700 border-b pb-3 mb-4 sm:mb-6">
+    <svg class="w-7 h-7 text-blue-650" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+      <path d="M12 14l6.16-3.422A12.083 12.083 0 0112 20.055a12.083 12.083 0 01-6.16-9.477L12 14z"/>
+    </svg>
+    Educational Background
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+    <div class="col-span-1 sm:col-span-2">
+      <input type="text" name="last_school_attended" id="last_school_attended" required
+        class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+               focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" placeholder="ex. Norzagaray Academy" oninput="this.value = this.value.toUpperCase()">
+      <label for="last_school_attended" class="block mt-1 text-sm font-medium text-gray-700">Name of Last School Attended<span class="text-red-500">*</span></label>
+    </div>
+
+    <div>
+      <select name="last_school_type" id="last_school_type"
+        class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+                focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" required>
+        <option disabled selected>---Select School Type---</option>
+        <option>PUBLIC</option>
+        <option>PRIVATE</option>
+        <option>CATHOLIC</option>
+        <option>OTHERS</option>
+      </select>
+      <label for="last_school_type" class="block mt-1 text-sm font-medium text-gray-700">School Type<span class="text-red-500">*</span></label>
+    </div>
+
+    <div class="col-span-1 sm:col-span-2">
+      <input type="text" name="last_school_address" id="last_school_address" required
+        class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+               focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" placeholder="ex. Poblacion, Norzagaray, Bulacan Philippines 3022" oninput="this.value = this.value.toUpperCase()">
+      <label for="last_school_address" class="block mt-1 text-sm font-medium text-gray-700">Last School's Address<span class="text-red-500">*</span></label>
+    </div>
+
+    <div>
+      <select type="text" name="academic_strand" id="academic_strand"
+        class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm
+               focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+        <option disabled selected>---Select Academic Strand---</option>
+        <option>ABM</option>
+        <option>STEM</option>
+        <option>HUMSS</option>
+        <option>GAS</option>
+        <option>Arts & Design</option>
+        <option>Sports</option>
+        <option>TVL</option>
+        <option>TVL-AFA</option>
+        <option>TVL-HE</option>
+        <option>TVL-IA</option>
+        <option>TVL-ICT</option>
+      </select>
+               <label for="academic_strand" class="block mt-1 text-sm font-medium text-gray-700">Academic Strand<span class="text-red-500">*</span></label>
+    </div>
+
+  </div>
+            </section>
+            <!-- Preffered Course Section -->
+            <section class="card p-4 sm:p-6 bg-white/95 border border-blue-100 rounded-lg shadow mt-6 sm:mt-10">
+        <h2 class="flex items-center gap-2 text-lg sm:text-2xl font-bold text-blue-700 border-b pb-3 mb-4 sm:mb-6">
+    <svg class="w-7 h-7 text-blue-650" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M4 4h12v2H4V4zm0 4h12v10H4V8z"/>
+    </svg>
+    Course Preferences
+  </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div>
+        <select name="course_first" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition" required>
+          <option disabled selected>---1st Choice---</option>
+          <option value="BSCS">BSCS</option>
+          <option value="ACT">ACT</option>
+          <option value="BSHM">BSHM</option>
+          <option value="BSED">BSED</option>
+          <option value="BEED">BEED</option>
+        </select>
+        <label for="course_first" class="block mt-1 text-sm font-medium text-gray-700">First Choice<span class="text-red-500">*</span></label>
+        </div>
+        <div>
+        <select name="course_second" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+          <option disabled selected>---2nd Choice---</option>
+          <option value="BSCS">BSCS</option>
+          <option value="ACT">ACT</option>
+          <option value="BSHM">BSHM</option>
+          <option value="BSED">BSED</option>
+          <option value="BEED">BEED</option>
+        </select>
+        <label for="course_second" class="block mt-1 text-sm font-medium text-gray-700">Second Choice</label>
+        </div>
+        <div>
+        <select name="course_third" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm 
+                    focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition">
+          <option disabled selected>---3rd Choice---</option>
+          <option value="BSCS">BSCS</option>
+          <option value="ACT">ACT</option>
+          <option value="BSHM">BSHM</option>
+          <option value="BSED">BSED</option>
+          <option value="BEED">BEED</option>
+        </select>
+        <label for="course_third" class="block mt-1 text-sm font-medium text-gray-700">Third Choice</label>
+        </div>
+      </div>
+            </section>
+
+
+
+        </div>
+
+
+<!-- Page 4 (edit this) -->
+<div class="form-page" data-page="4" style="display:none;">
+  <div id="docs-transferee" class="border p-4 rounded bg-gray-50">
+  <h2 class="flex items-center gap-2 text-lg sm:text-2xl font-bold text-blue-700 border-b pb-3 mb-4 sm:mb-6">
+    <svg class="w-7 h-7 text-blue-650" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M4 4h12v2H4V4zm0 4h12v10H4V8z"/>
+    </svg>
+    Transferee Requirements
+  </h2>
+  <p class="text-sm text-gray-600 mb-4">Note: Maximum file size for all documents is 1.2MB. Accepted formats: JPG, PNG, PDF</p>
+
+  <!-- Grid with 3 columns -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Honorable Dismissal<span class="text-red-500">*</span></label>
+      <input type="file" name="stuHonDis" id="stuHonDis" class="file-input w-full" required>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Certificate of Grades<span class="text-red-500">*</span></label>
+      <input type="file" name="stuCOG" id="stuCOG" class="file-input w-full" required>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Good Moral Certificate<span class="text-red-500">*</span></label>
+      <input type="file" name="stuGoodMoral" id="stuGoodMoral" class="file-input w-full" required>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">PSA Birth Certificate<span class="text-red-500">*</span></label>
+      <input type="file" name="stuPSA" id="stuPSA" class="file-input w-full" required>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">2x2 Picture<span class="text-red-500">*</span></label>
+      <input type="file" name="stuPic" id="stuPic" class="file-input w-full" required>
+    </div>
+  </div>
+</div>
+
+<section class="bg-gray-50 p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 text-center fade-up mt-6 sm:mt-10" style="animation-delay:0.4s">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <input type="checkbox" id="agree" class="w-4 h-4">
+          <label for="agree" class="text-sm text-gray-700">
+            By clicking Submit, you agree to our 
+            <span id="openTerms" class="text-blue-600 underline cursor-pointer">Terms and Condition</span>
+          </label>
+        </div>
+        <button type="submit" id="submitBtn" disabled
+          class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-3 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transform transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Submit
+        </button>
+      </section>
+      </div>
+
+
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between mt-6 gap-4">
+                    <button type="button" id="prevBtn" class="px-5 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-medium" disabled>Prev</button>
+                    <div id="pageIndicator" class="text-sm text-gray-700">Page 1 / 4</div>
+                    <div class="flex gap-2">
+                        <button type="button" id="nextBtn" class="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">Next</button>
+                        
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+
+
+
+<script>
+    // Flatpickr init
+    function calculateAge(birthdate) {
+    if (!birthdate) return '';
+    const today = new Date();
+    const birth = new Date(birthdate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+
+
+// Location Dropdowns
+async function loadProvinces() {
+  const res = await fetch('/api/provinces');
+  const provinces = await res.json();
+  const dropdown = document.getElementById('province');
+  provinces.forEach(p => {
+    // value = name (saved to DB), data-code = code (used for chaining API calls)
+    dropdown.innerHTML += `<option value="${p.name}" data-code="${p.code}">${p.name.toUpperCase()}</option>`;
+  });
+}
+
+document.getElementById('province').addEventListener('change', async function() {
+  // Get the code from the selected option's data-code attribute
+  const selectedOption = this.options[this.selectedIndex];
+  const provinceCode = selectedOption.getAttribute('data-code');
+  const res = await fetch(`/api/municipalities/${provinceCode}`);
+  const municipalities = await res.json();
+  const dropdown = document.getElementById('municipality');
+  dropdown.innerHTML = '<option value="">---Select Municipality---</option>';
+  // Reset barangay too
+  document.getElementById('barangay').innerHTML = '<option value="">---Select Barangay---</option>';
+  municipalities.forEach(m => {
+    dropdown.innerHTML += `<option value="${m.name}" data-code="${m.code}">${m.name.toUpperCase()}</option>`;
+  });
+});
+
+document.getElementById('municipality').addEventListener('change', async function() {
+  const selectedOption = this.options[this.selectedIndex];
+  const municipalityCode = selectedOption.getAttribute('data-code');
+  const res = await fetch(`/api/barangays/${municipalityCode}`);
+  const barangays = await res.json();
+  const dropdown = document.getElementById('barangay');
+  dropdown.innerHTML = '<option value="">---Select Barangay---</option>';
+  barangays.forEach(b => {
+    dropdown.innerHTML += `<option value="${b.name}" data-code="${b.code}">${b.name.toUpperCase()}</option>`;
+  });
+});
+
+loadProvinces();
+</script>
+
+<script>
+// SweetAlert2 Terms and Condition logic
+const termsText = `<p class="text-gray-700 text-sm leading-relaxed mb-4">
+      I hereby certify that all I have indicated herein are complete, true and correct. 
+      I understand that I have to abide to Norzagaray College Admission Test (NC-AT) rules and regulations. 
+      Any misinformation shall serve as ground for nullification/ineligible of my admission at Norzagaray College.
+    </p>
+
+    <p class="text-gray-500 text-xs leading-relaxed border-t pt-3">
+      <strong>Note:</strong> All data gathered will be kept confidential in compliance with the 
+      <em>Republic Act 10173</em> otherwise known as the Data Privacy Act of 2012 and shall only be used 
+      for school record purposes and shall be accessed only by authorized school personnel.
+    </p>`;
+
+const agreeCheckbox = document.getElementById('agree');
+const openTerms = document.getElementById('openTerms');
+const submitBtn = document.getElementById('submitBtn');
+
+function showTermsAndEnable() {
+  Swal.fire({
+    title: 'Terms and Condition',
+    html: termsText,
+    icon: 'info',
+    confirmButtonText: 'I Agree',
+    customClass: {
+      confirmButton: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-3 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transform transition',
+    },
+    buttonsStyling: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false
+  }).then((result) => {
+    if (result.isConfirmed) {
+      agreeCheckbox.checked = true;
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+openTerms.addEventListener('click', showTermsAndEnable);
+agreeCheckbox.addEventListener('click', function(e) {
+  if (!agreeCheckbox.checked) {
+    e.preventDefault();
+    showTermsAndEnable();
+  } else {
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</script>
+
+<script>
+// Carousel navigation for the multi-page form
+(() => {
+    const pages = Array.from(document.querySelectorAll('.form-page'));
+    let current = 1;
+    const total = pages.length || 4;
+
+    // Function to validate required fields on current page
+    function validateCurrentPage() {
+        const currentPage = pages[current - 1];
+        const requiredFields = currentPage.querySelectorAll('[required]');
+        let allFilled = true;
+
+        requiredFields.forEach(field => {
+            let isEmpty = false;
+            
+            // Check if it's a select field
+            if (field.tagName === 'SELECT') {
+                // For selects, check if value is empty or if it's the placeholder option
+                if (!field.value || field.value.trim() === '' || field.options[field.selectedIndex].disabled) {
+                    isEmpty = true;
+                }
+            } else {
+                // For text/number/email/date inputs
+                if (!field.value || field.value.trim() === '') {
+                    isEmpty = true;
+                }
+            }
+            
+            if (isEmpty) {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            Swal.fire({
+                title: 'Incomplete Form',
+                text: 'Please fill out all required fields before proceeding to the next page.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-lg',
+                },
+                buttonsStyling: false
+            });
+        }
+
+        return allFilled;
+    }
+
+    function showPage(n) {
+        pages.forEach(p => p.style.display = (Number(p.dataset.page) === n) ? 'block' : 'none');
+        const indicator = document.getElementById('pageIndicator');
+        if (indicator) indicator.textContent = `Page ${n} / ${total}`;
+        const prev = document.getElementById('prevBtn');
+        const next = document.getElementById('nextBtn');
+        const submit = document.getElementById('submitBtn');
+        if (prev) prev.disabled = n === 1;
+        if (n === total) {
+            if (next) next.style.display = 'none';
+            if (submit) submit.style.display = 'inline-block';
+        } else {
+            if (next) next.style.display = 'inline-block';
+            if (submit) submit.style.display = 'none';
+        }
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+        if (current < total && validateCurrentPage()) { 
+            current++; 
+            showPage(current); 
+        }
+    });
+    document.getElementById('prevBtn').addEventListener('click', () => {
+        if (current > 1) { current--; showPage(current); }
+    });
+
+    // Initialize
+    showPage(current);
+})();
+</script>
+
+<script>
+// Form submission handler
+document.getElementById('admissionForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  
+  // Show loading overlay
+  loadingOverlay.classList.add('active');
+  
+  try {
+    const response = await fetch('/admission', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await response.json();
+    
+    // Hide loading overlay
+    loadingOverlay.classList.remove('active');
+    
+    if (result.success) {
+      Swal.fire({
+        title: 'Success!',
+        text: result.message,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-lg',
+        },
+        buttonsStyling: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      }).then(() => {
+        window.location.href = '/';
+      });
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: result.message,
+        icon: 'error',
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-lg',
+        },
+        buttonsStyling: false
+      });
+    }
+  } catch (error) {
+    // Hide loading overlay on error
+    loadingOverlay.classList.remove('active');
+    
+    Swal.fire({
+      title: 'Error',
+      text: 'An error occurred while submitting your application: ' + error.message,
+      icon: 'error',
+      confirmButtonText: 'OK',
+      customClass: {
+        confirmButton: 'bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2 rounded-lg',
+      },
+      buttonsStyling: false
+    });
+  }
+});
+</script>
+
+
+<script>
+// ── Custom Blue Calendar ──────────────────────────────────────────────────
+(function() {
+  const input     = document.getElementById('birthdate');
+  const ageInput  = document.getElementById('age');
+  if (!input) return;
+
+  // Build popup HTML
+  const wrapper = document.createElement('div');
+  wrapper.className = 'cal-wrapper';
+  input.parentNode.insertBefore(wrapper, input);
+  wrapper.appendChild(input);
+
+  const popup = document.createElement('div');
+  popup.className = 'cal-popup';
+  popup.innerHTML = `
+    <div class="cal-header">
+      <button id="calPrev">&#10094;</button>
+      <h2 id="calMonthYear"></h2>
+      <button id="calNext">&#10095;</button>
+    </div>
+    <div class="cal-year-row">
+      <button id="calYearDown">&#8722;</button>
+      <span id="calYearLabel"></span>
+      <button id="calYearUp">&#43;</button>
+    </div>
+    <div class="cal-day-names">
+      <div>Su</div><div>Mo</div><div>Tu</div>
+      <div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+    </div>
+    <div class="cal-days" id="calDays"></div>
+  `;
+  wrapper.appendChild(popup);
+
+  const today    = new Date();
+  let viewDate   = new Date(today.getFullYear() - 18, today.getMonth(), 1);
+  let selected   = null;
+
+  function calcAge(y, m, d) {
+    let age = today.getFullYear() - y;
+    const mo = today.getMonth() - m;
+    if (mo < 0 || (mo === 0 && today.getDate() < d)) age--;
+    return age;
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  function render() {
+    const year  = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    document.getElementById('calMonthYear').textContent =
+      viewDate.toLocaleString('default', { month: 'long' });
+    document.getElementById('calYearLabel').textContent = year;
+
+    const firstDay  = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const container = document.getElementById('calDays');
+    container.innerHTML = '';
+
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div');
+      el.className = 'cal-empty';
+      container.appendChild(el);
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+      const el   = document.createElement('div');
+      el.textContent = day;
+      const thisDate = new Date(year, month, day);
+
+      // Disable future dates
+      if (thisDate > today) {
+        el.classList.add('cal-disabled');
+        container.appendChild(el);
+        continue;
+      }
+      const isToday    = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+      const isSelected = selected && day === selected.d && month === selected.m && year === selected.y;
+      if (isToday)    el.classList.add('cal-today');
+      if (isSelected) el.classList.add('cal-selected');
+
+      el.addEventListener('click', () => {
+        selected = { y: year, m: month, d: day };
+        // Format display: "Month D, YYYY"
+        const months = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+        const displayVal = `${months[month]} ${day}, ${year}`;
+        const rawVal = `${year}-${pad(month+1)}-${pad(day)}`;
+        input.value = displayVal;
+        // Write raw yyyy-MM-dd to hidden input for form submission
+        const rawInput = document.getElementById('birthdate_raw');
+        if (rawInput) rawInput.value = rawVal;
+        if (ageInput) ageInput.value = calcAge(year, month, day);
+        popup.classList.remove('open');
+        render();
+      });
+      container.appendChild(el);
+    }
+  }
+
+  document.getElementById('calPrev').addEventListener('click', (e) => {
+    e.stopPropagation();
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    render();
+  });
+  document.getElementById('calNext').addEventListener('click', (e) => {
+    e.stopPropagation();
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    render();
+  });
+  document.getElementById('calYearDown').addEventListener('click', (e) => {
+    e.stopPropagation();
+    viewDate.setFullYear(viewDate.getFullYear() - 1);
+    render();
+  });
+  document.getElementById('calYearUp').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const newYear = viewDate.getFullYear() + 1;
+    if (newYear <= today.getFullYear()) { viewDate.setFullYear(newYear); render(); }
+  });
+
+  input.addEventListener('click', (e) => {
+    e.stopPropagation();
+    popup.classList.toggle('open');
+    render();
+  });
+  input.style.cursor = 'pointer';
+  input.addEventListener('keydown', (e) => e.preventDefault()); // block manual typing
+
+  document.addEventListener('click', () => popup.classList.remove('open'));
+  popup.addEventListener('click', (e) => e.stopPropagation());
+
+  render();
+})();
+</script>
+
+</body>
+
+</html>

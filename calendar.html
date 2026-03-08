@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Calendar</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .calendar {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        padding: 20px;
+        width: 350px;
+    }
+    .calendar header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .calendar header h2 {
+        margin: 0;
+        font-size: 1.4em;
+        color: #333;
+    }
+    .calendar header button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+    .calendar header button:hover {
+        background: #45a049;
+    }
+    .day-names, .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+    }
+    .day-names div {
+        font-weight: bold;
+        padding: 8px 0;
+        color: #555;
+    }
+    .days div {
+        padding: 10px 0;
+        margin: 2px;
+        border-radius: 6px;
+        transition: background 0.3s;
+    }
+    .days div:hover {
+        background: #e0f7fa;
+        cursor: pointer;
+    }
+    .today {
+        background: #4CAF50;
+        color: white;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="calendar">
+    <header>
+        <button id="prev">&#10094;</button>
+        <h2 id="month-year"></h2>
+        <button id="next">&#10095;</button>
+    </header>
+    <div class="day-names">
+        <div>Sun</div><div>Mon</div><div>Tue</div>
+        <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="days" id="days"></div>
+</div>
+
+<script>
+    const daysContainer = document.getElementById("days");
+    const monthYear = document.getElementById("month-year");
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+
+    let date = new Date();
+
+    function renderCalendar() {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+
+        // Set month-year title
+        monthYear.textContent = date.toLocaleString("default", { month: "long", year: "numeric" });
+
+        // Get first day of the month
+        const firstDay = new Date(year, month, 1).getDay();
+        // Get total days in month
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        daysContainer.innerHTML = "";
+
+        // Add empty slots for days before the first day
+        for (let i = 0; i < firstDay; i++) {
+            daysContainer.innerHTML += `<div></div>`;
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= totalDays; day++) {
+            const isToday = 
+                day === new Date().getDate() &&
+                month === new Date().getMonth() &&
+                year === new Date().getFullYear();
+
+            daysContainer.innerHTML += `<div class="${isToday ? 'today' : ''}">${day}</div>`;
+        }
+    }
+
+    prevBtn.addEventListener("click", () => {
+        date.setMonth(date.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextBtn.addEventListener("click", () => {
+        date.setMonth(date.getMonth() + 1);
+        renderCalendar();
+    });
+
+    renderCalendar();
+</script>
+
+</body>
+</html>
