@@ -21,6 +21,42 @@ def parse_birthdate(raw):
             continue
     return None
 
+def generate_admission_number(cursor):
+    """Generate next admission number in format YYYYS####
+    e.g. 202510001 = year 2025, semester 1, sequence 0001
+    Matches the format used by the admin panel."""
+    today = datetime.now()
+    year = today.year
+
+    # Get semester from school_status
+    try:
+        cursor.execute("SELECT semester FROM school_status ORDER BY id DESC LIMIT 1")
+        row = cursor.fetchone()
+        sem_raw = str(row["semester"] if row else "1").strip().upper()
+        sem = "2" if sem_raw.startswith("2") or "SECOND" in sem_raw else "1"
+    except Exception:
+        sem = "1"
+
+    prefix = f"{year}{sem}"
+
+    # Find the highest existing sequence for this year+sem prefix
+    cursor.execute(
+        "SELECT student_admission_number FROM admissions WHERE student_admission_number LIKE %s",
+        (f"{prefix}%",)
+    )
+    existing = [r[0] for r in cursor.fetchall()]
+    max_seq = 0
+    for num in existing:
+        try:
+            seq = int(str(num)[len(prefix):])
+            if seq > max_seq:
+                max_seq = seq
+        except (ValueError, IndexError):
+            pass
+
+    return f"{prefix}{(max_seq + 1):04d}"
+
+
 def get_db_connection():
     conn = mysql.connector.connect(
         host=os.environ.get("DB_HOST"),
@@ -305,10 +341,14 @@ def admission_freshmen():
         
         # Connect to database
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # Generate unique admission number
+        adm_number = generate_admission_number(cursor)
         
         # Prepare data tuple
         data_tuple = (
+            adm_number,
             last_name, first_name, middle_name, suffix,
             gender, birthdate, age, civil_status, nationality, religion, disability,
             email, contact_number,
@@ -326,6 +366,7 @@ def admission_freshmen():
         # SQL Insert statement
         sql = """
         INSERT INTO `admissions`(
+            `student_admission_number`,
             `student_lastname`, `student_firstname`, `student_middlename`, `student_suffix`,
             `student_gender`, `student_birthdate`, `student_age`, `student_civilstatus`, `student_nationality`, `student_religion`, `student_dissability`, 
             `student_email`, `student_contactnumber`, 
@@ -340,6 +381,7 @@ def admission_freshmen():
             `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`
         )
         VALUES (
+            %s,
             %s, %s, %s, %s,
             %s, %s, %s, %s, %s, %s, %s,
             %s, %s,
@@ -489,10 +531,14 @@ def admission_transferee():
         
         # Connect to database
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # Generate unique admission number
+        adm_number = generate_admission_number(cursor)
         
         # Prepare data tuple
         data_tuple = (
+            adm_number,
             last_name, first_name, middle_name, suffix,
             gender, birthdate, age, civil_status, nationality, religion, disability,
             email, contact_number,
@@ -510,6 +556,7 @@ def admission_transferee():
         # SQL Insert statement
         sql = """
         INSERT INTO `admissions`(
+            `student_admission_number`,
             `student_lastname`, `student_firstname`, `student_middlename`, `student_suffix`,
             `student_gender`, `student_birthdate`, `student_age`, `student_civilstatus`, `student_nationality`, `student_religion`, `student_dissability`, 
             `student_email`, `student_contactnumber`, 
@@ -524,6 +571,7 @@ def admission_transferee():
             `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`
         )
         VALUES (
+            %s,
             %s, %s, %s, %s,
             %s, %s, %s, %s, %s, %s, %s,
             %s, %s,
