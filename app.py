@@ -1,10 +1,67 @@
 from flask import Flask, request, jsonify, render_template
 import mysql.connector
-from datetime import date
+from datetime import date, datetime
 from email_service import send_application_confirmation_email
 from PIL import Image
 import io
 import os
+
+def parse_birthdate(raw):
+    """Convert any birthdate string to YYYY-MM-DD for MySQL.
+    Handles: 'March 23, 2000', '2000-03-23', '03/23/2000', '23/03/2000'
+    Returns None if empty or unparseable.
+    """
+    if not raw or not raw.strip():
+        return None
+    raw = raw.strip()
+    for fmt in ('%B %d, %Y', '%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%m-%d-%Y'):
+        try:
+            return datetime.strptime(raw, fmt).strftime('%Y-%m-%d')
+        except ValueError:
+            continue
+    return None
+
+def generate_admission_number(cursor):
+    """Generate next admission number in format YYYYS####
+    e.g. 202510001 = year 2025, semester 1, sequence 0001
+    Matches the format used by the admin panel."""
+    year = datetime.now().year
+
+    # Get semester from school_status (try both cases)
+    sem = "1"
+    try:
+        cursor.execute("SELECT semester FROM school_status ORDER BY id DESC LIMIT 1")
+        row = cursor.fetchone()
+        if row:
+            val = row["semester"] if isinstance(row, dict) else row[0]
+            sem_raw = str(val).strip().upper()
+            sem = "2" if sem_raw.startswith("2") or "SECOND" in sem_raw else "1"
+    except Exception:
+        sem = "1"
+
+    prefix = f"{year}{sem}"
+
+    # Find the highest existing sequence for this year+sem prefix
+    try:
+        cursor.execute(
+            "SELECT student_admission_number FROM admissions WHERE student_admission_number LIKE %s",
+            (f"{prefix}%",)
+        )
+        rows = cursor.fetchall()
+        max_seq = 0
+        for row in rows:
+            val = row["student_admission_number"] if isinstance(row, dict) else row[0]
+            try:
+                seq = int(str(val)[len(prefix):])
+                if seq > max_seq:
+                    max_seq = seq
+            except (ValueError, IndexError):
+                pass
+    except Exception:
+        max_seq = 0
+
+    return f"{prefix}{(max_seq + 1):04d}"
+
 
 def get_db_connection():
     conn = mysql.connector.connect(
@@ -26,6 +83,12 @@ def get_db_connectionforlocation():
     )
 app = Flask(__name__)
 app_secret_key = "your_secret_key_here"
+
+@app.errorhandler(500)
+def internal_error(e):
+    import traceback
+    traceback.print_exc()
+    return jsonify({"success": False, "message": f"Server error: {str(e)}"}), 500
 
 
 @app.route('/api/provinces')
@@ -207,7 +270,7 @@ def admission_freshmen():
         suffix = request.form.get("suffix")
         civil_status = request.form.get("civil_status")
         gender = request.form.get("gender")
-        birthdate = request.form.get("birthdate", "")
+        birthdate = parse_birthdate(request.form.get("birthdate", ""))
         age = request.form.get("age")
         nationality = request.form.get("nationality")
         religion = request.form.get("religion")
@@ -290,10 +353,14 @@ def admission_freshmen():
         
         # Connect to database
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # Generate unique admission number
+        adm_number = generate_admission_number(cursor)
         
         # Prepare data tuple
         data_tuple = (
+            adm_number,
             last_name, first_name, middle_name, suffix,
             gender, birthdate, age, civil_status, nationality, religion, disability,
             email, contact_number,
@@ -311,6 +378,7 @@ def admission_freshmen():
         # SQL Insert statement
         sql = """
         INSERT INTO `admissions`(
+            `student_admission_number`,
             `student_lastname`, `student_firstname`, `student_middlename`, `student_suffix`,
             `student_gender`, `student_birthdate`, `student_age`, `student_civilstatus`, `student_nationality`, `student_religion`, `student_dissability`, 
             `student_email`, `student_contactnumber`, 
@@ -322,9 +390,11 @@ def admission_freshmen():
             `student_lastschool_attended`, `student_lastschool_type`, `student_lastschool_address`, `student_academic_strand`, 
             `student_course_choice1`, `student_course_choice2`, `student_course_choice3`, 
             `student_type`, 
-            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`
+            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`,
+            `student_examgrade`, `admission_rejection_reason`
         )
         VALUES (
+            %s,
             %s, %s, %s, %s,
             %s, %s, %s, %s, %s, %s, %s,
             %s, %s,
@@ -336,7 +406,8 @@ def admission_freshmen():
             %s, %s, %s, %s,
             %s, %s, %s,
             %s,
-            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending'
+            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending',
+            0, ''
         )
         """
         
@@ -391,7 +462,7 @@ def admission_transferee():
         suffix = request.form.get("suffix")
         civil_status = request.form.get("civil_status")
         gender = request.form.get("gender")
-        birthdate = request.form.get("birthdate", "")
+        birthdate = parse_birthdate(request.form.get("birthdate", ""))
         age = request.form.get("age")
         nationality = request.form.get("nationality")
         religion = request.form.get("religion")
@@ -474,10 +545,14 @@ def admission_transferee():
         
         # Connect to database
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # Generate unique admission number
+        adm_number = generate_admission_number(cursor)
         
         # Prepare data tuple
         data_tuple = (
+            adm_number,
             last_name, first_name, middle_name, suffix,
             gender, birthdate, age, civil_status, nationality, religion, disability,
             email, contact_number,
@@ -495,6 +570,7 @@ def admission_transferee():
         # SQL Insert statement
         sql = """
         INSERT INTO `admissions`(
+            `student_admission_number`,
             `student_lastname`, `student_firstname`, `student_middlename`, `student_suffix`,
             `student_gender`, `student_birthdate`, `student_age`, `student_civilstatus`, `student_nationality`, `student_religion`, `student_dissability`, 
             `student_email`, `student_contactnumber`, 
@@ -506,9 +582,11 @@ def admission_transferee():
             `student_lastschool_attended`, `student_lastschool_type`, `student_lastschool_address`, `student_academic_strand`, 
             `student_course_choice1`, `student_course_choice2`, `student_course_choice3`, 
             `student_type`, 
-            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`
+            `student_picture`, `student_psa`, `student_goodmoral`, `student_form138`, `student_certificateofenrollment`, `student_honorabledismissal`, `student_certificateofgrade`, `student_date_submitted`, `student_admission_status`,
+            `student_examgrade`, `admission_rejection_reason`
         )
         VALUES (
+            %s,
             %s, %s, %s, %s,
             %s, %s, %s, %s, %s, %s, %s,
             %s, %s,
@@ -520,7 +598,8 @@ def admission_transferee():
             %s, %s, %s, %s,
             %s, %s, %s,
             %s,
-            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending'
+            %s, %s, %s, %s, %s, %s, %s, %s, 'Pending',
+            0, ''
         )
         """
         
